@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Blessy Suju: Turbo Queen</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+    }
+    #gameArea {
+      position: relative;
+      width: 400px;
+      height: 600px;
+      margin: 20px auto;
+      background-color: #222;
+      border: 2px solid #f0f0f0;
+      overflow: hidden;
+    }
+    .car {
+      position: absolute;
+      width: 40px;
+      height: 60px;
+      background-color: hotpink;
+      border-radius: 10px;
+    }
+    .rival {
+      background-color: red;
+    }
+    .token {
+      background-color: gold;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Blessy Suju: Turbo Queen 🏁</h1>
+  <p>Use ← and → to steer. Collect 3 tokens to activate Suju Boost!</p>
+  <div id="gameArea">
+    <div id="blessy" class="car" style="left:180px; top:520px;"></div>
+  </div>
+  <script>
+    const blessy = document.getElementById("blessy");
+    const gameArea = document.getElementById("gameArea");
+    let blessyX = 180;
+    let turboMeter = 0;
+    let speed = 2;
+
+    // Create rivals
+    const rivals = [];
+    for (let i = 0; i < 3; i++) {
+      const rival = document.createElement("div");
+      rival.classList.add("car", "rival");
+      rival.style.left = `${Math.random() * 360}px`;
+      rival.style.top = `${-100 * i}px`;
+      gameArea.appendChild(rival);
+      rivals.push(rival);
+    }
+
+    // Create tokens
+    const tokens = [];
+    for (let i = 0; i < 3; i++) {
+      const token = document.createElement("div");
+      token.classList.add("token");
+      token.style.left = `${Math.random() * 380}px`;
+      token.style.top = `${-150 * i}px`;
+      gameArea.appendChild(token);
+      tokens.push(token);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft" && blessyX > 0) blessyX -= 10;
+      if (e.key === "ArrowRight" && blessyX < 360) blessyX += 10;
+      blessy.style.left = blessyX + "px";
+    });
+
+    function gameLoop() {
+      // Move rivals
+      rivals.forEach(rival => {
+        let y = parseInt(rival.style.top);
+        y += speed;
+        if (y > 600) {
+          y = -60;
+          rival.style.left = `${Math.random() * 360}px`;
+        }
+        rival.style.top = y + "px";
+
+        // Collision check
+        if (Math.abs(y - 520) < 50 && Math.abs(parseInt(rival.style.left) - blessyX) < 40) {
+          alert("Blessy Suju Crashed! 💥");
+          location.reload();
+        }
+      });
+
+      // Move tokens
+      tokens.forEach(token => {
+        let y = parseInt(token.style.top);
+        y += speed;
+        if (y > 600) {
+          y = -20;
+          token.style.left = `${Math.random() * 380}px`;
+        }
+        token.style.top = y + "px";
+
+        // Collection check
+        if (Math.abs(y - 520) < 30 && Math.abs(parseInt(token.style.left) - blessyX) < 40) {
+          turboMeter++;
+          token.style.top = "-20px";
+          token.style.left = `${Math.random() * 380}px`;
+          if (turboMeter >= 3) {
+            speed = 5;
+            setTimeout(() => {
+              speed = 2;
+              turboMeter = 0;
+            }, 3000);
+          }
+        }
+      });
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+  </script>
+</body>
+</html>
